@@ -13,7 +13,8 @@
 |------------------------|----------------------------------------|
 | WildFly (früher JBoss) | IBM Websphere Application Server (WAS) |
 | Payara Server          | Oracle WebLogic Server                 |
-| Open Libery            |                                        |
+| Open Libery            | SAP NetWeaver Application Server       |
+| Glassfish              | Oracle AS                              |
 
 ## Welche Firma steht hinter dem open-source application server Wildfly?
 
@@ -210,7 +211,25 @@ public class StudentService {
     
 }
 ```
-Transactional bei Post, bsp. logservice, der immer persistiert, egal was passiert (entityManager nennen)
+
+@Transactional führt dazu, dass logs z.B. auch nicht gespeichert werden,
+wenn innerhalb der Transaktion etwas schiefgeht. Das kann man lösen indem
+man einen weiteren @Transactional für den Logger öffnet
+
+```java
+import javax.enterprise.context.ApplicationScoped;
+import javax.transaction.Transactional;
+
+@ApplicationScoped
+public class LoggerService {
+
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public void logToDatabase(String message) {
+        // Logik zum Schreiben der Nachricht in die Datenbank
+    }
+}
+
+```
 
 ## Mit welcher Annotation wird ein Objekt von CDI injiziert?
 
@@ -553,5 +572,25 @@ public interface CarMapper {
 ```
 
 mapstruct: https://mapstruct.org/
+
+##  Aufbau des Java EE Servers:
+
+Ein Java EE Server ist eine Laufzeitumgebung, die verschiedene Container
+bereitstellt, um eine Java EE Anwendung auszuführen. Jeder Container
+bietet spezifische Dienste und APIs, die auf die Anforderungen der in
+ihm ausgeführten Komponenten zugeschnitten sind.
+
+Die Container bieten eine Reihe von Diensten, darunter Security, 
+Transaktionsmanagement, Lebenszyklusmanagement, Multithreading,
+Ressourcenpooling und andere. Sie stellen auch eine Schnittstelle
+zu den verschiedenen Java EE APIs bereit.
+
+| Container                  | Aufgabe                                                                                                                                                                                 |
+|----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| EJB-Container              | Verwaltet die Ausführung von Enterprise JavaBeans (EJBs). EJBs sind serverseitige Komponenten, die hauptsächlich zur Implementierung von Geschäftslogik und Persistenz verwendet werden |
+| Web-Container              | Verwaltet die Ausführung von Web-Komponenten wie Servlets und JavaServer Pages (JSPs)                                                                                                   |
+| Anwendungsclient-Container | Verwaltet die Ausführung von Anwendungsclient-Componenten                                                                                                                               |
+| Applet-Container           | Verwaltet die Ausführung von Applets                                                                                                                                                    |
+
 
 
